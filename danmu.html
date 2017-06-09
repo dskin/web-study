@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>danmu</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+		.content{
+			height: 500px;
+			width: 100%;
+			border: 1px solid #999;
+			position: relative;
+		}
+
+		.control{
+			width: 100%;
+			height: 200px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.control-button{
+			display: flex;
+			justify-content: center;
+		}
+
+		.danmu{
+			width: 400px;
+			height: 30px;
+			padding-left: 10px;
+			margin-bottom: 20px;
+		}
+
+		.control-button button{
+			width: 100px;
+			height: 30px;
+			background-color: #fff;
+			margin-left: 10px;
+			outline: none;
+			cursor: pointer;
+		}
+
+		.control-button button:first-child{
+			color:#e65000;
+			border: 1px solid #e65000;
+		}
+
+		.control-button button:last-child{
+			color:#999;
+			border: 1px solid #999;
+		}
+	</style>
+</head>
+<body>
+	<div class="content" id="content">
+	</div>
+	<div class="control">
+		<div class="control-wrap">
+			<input type="text" name="danmu" class="danmu" placeholder="说点儿什么吧！" id="danmu" autofocus>
+			<div class="control-button">
+				<button id="start">发射</button>
+				<button id="clear">清屏</button>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		window.onload = function(){
+			// 获取节点
+			var content = document.getElementById("content");
+			var danmu = document.getElementById("danmu");
+			var start = document.getElementById("start");
+			var clear = document.getElementById("clear");
+
+			// 定义变换的颜色
+			var color = ["09c","f66","f03","cf0","66f"];
+			// 定义弹幕初始距离内容显示区顶部的距离
+			var top = 0;
+
+			// 发送按钮事件监听函数
+			start.addEventListener('click',function(){
+				var colorRandom = parseInt(Math.random()*10/2);
+				var danmuText = danmu.value;
+				// 如果不传入任何值，则退出
+				if(danmuText == ""){
+					return;
+				}
+				// 根据传入的文本内容创建子节点
+				var div = document.createElement("div");
+				div.innerHTML = danmuText;
+				div.style = "color:#" + color[colorRandom] + ";padding:10px;position:absolute;right:-10px";
+				// 将创建好的div节点插入到弹幕内容区中
+				content.appendChild(div);
+				startMove(div);
+				// 置空输入弹幕文字
+				danmu.value = "";
+			});
+
+			// 清屏按钮事件监听函数
+			clear.addEventListener('click',function(){
+				while(content.firstChild){
+					content.removeChild(content.firstChild);
+				};
+				top = 0;
+			});
+
+			// 弹幕动画函数
+			function startMove(ele){
+				var content = document.getElementById("content");
+				
+				var initLeft = ele.offsetLeft;
+				var cssCont = document.defaultView.getComputedStyle(content,null);
+				var contHeight = parseInt(cssCont.height,10);
+				ele.style.top = top + "px";
+				top += 50;
+				// 判断弹幕是否还在弹幕内容区内，若不在，则设置其绝对定位top属性为0，重新回到第一行
+				if(top >= contHeight){
+					top = 0;
+				}
+				setInterval(function(){
+					ele.style.left = ele.offsetLeft - 2 + "px";
+					var leftNum = parseInt(ele.style.left);
+					if(leftNum < 0){
+						ele.style.left = initLeft + "px";
+					}
+				},10);
+			}
+		};
+	</script>
+</body>
+</html>
